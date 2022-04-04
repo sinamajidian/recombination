@@ -1,0 +1,42 @@
+#!/bin/bash
+
+#SBATCH --nodes 1
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 35
+#SBATCH --mem 90G
+#SBATCH --time 10:00:00
+
+
+export PYTHONUNBUFFERED=1
+pos_i=1
+threads=25
+region_size=30000
+working_folder_root="/scratch/smajidi1/scratch_recomb/"
+#"/work/FAC/FBM/DBC/cdessim2/default/smajidi1/recombination/read_v4a"
+
+read_eval_code="/work/FAC/FBM/DBC/cdessim2/default/smajidi1/recombination/archive/read4a.sh"
+parent=HG004 # mother
+pos_M_list=( 1 2 195379000 70127000 5 32529000 7 8 9 10 11267000 80850000 13 106795000 15 16 21517000 18 19 20 9857000)
+
+#parent=HG003 # father
+#pos_F_list=(1 2 3 4 5 6 61163000 8 66469000 42538000 49744000 12 13 14 15 21230000 43682000 18 19 20 10729000 24372000)
+#for chrom in 7 9 19 11 16 17 21 22; do
+
+
+
+for chrom in 3 4 6 11 12 14 17 21; do
+pos=${pos_F_list[$((${chrom}-1))]}
+working_folder="${working_folder_root}/${parent}/${chrom}_${pos_i}"
+mkdir -p ${working_folder}
+cd ${working_folder}
+
+
+echo "Running ${read_eval_code} ${chrom} ${working_folder} ${pos} ${threads} ${region_size} ${parent} "
+
+bash ${read_eval_code} ${chrom} ${working_folder} ${pos} ${threads} ${region_size}  ${parent} &
+
+done
+wait
+
+
+echo " *** done  *** "
